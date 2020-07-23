@@ -1,0 +1,158 @@
+const { Router } = require("express");
+const Card = require("../models").card;
+const Bid = require("../models").bid;
+
+const authMiddleware = require("../auth/middleware");
+
+const router = new Router();
+
+router.post("/", authMiddleware, async (req, res, next) => {
+  const { title, imageUrl, minimumBid, userId } = req.body;
+  if (!title || !imageUrl || !minimumBid || !userId) {
+    res.status(400).send("Bad Request!");
+  } else {
+    try {
+      const newCard = await Card.create({
+        title,
+        imageUrl,
+        minimumBid,
+        userId,
+        hearts: 0,
+      });
+      res.send(newCard);
+    } catch (error) {
+      next(error);
+    }
+  }
+});
+
+router.get("/highestbid/:cardId", async (req, res, next) => {
+  const id = parseInt(req.params.cardId);
+  try {
+    const bidAmounts = await Bid.findAll({
+      where: {
+        cardId: id,
+      },
+      order: [["amount", "DESC"]],
+    });
+    if (bidAmounts[0]) {
+      const highestBid = bidAmounts[0].amount;
+      const highestBidEmail = bidAmounts[0].email;
+      res.send({ cardId: id, highestBid, highestBidEmail });
+    } else {
+      res.send({ cardId: id, highestBid: 0, highestBidEmail: " " });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/bid", authMiddleware, async (req, res, next) => {
+  const { cardId, amount, email } = req.body;
+  try {
+    const card = await Card.findByPk(cardId);
+    const minimum = card.minimumBid;
+
+    const bidAmounts = await Bid.findAll({
+      where: {
+        cardId: cardId,
+      },
+      order: [["amount", "DESC"]],
+    });
+
+    if (!bidAmounts[0]) {
+      if (amount >= minimum && amount) {
+        try {
+          const bid = await Bid.create({
+            cardId,
+            email,
+            amount,
+          });
+
+          res.send(bid);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    } else {
+      if (amount > bidAmounts[0].amount) {
+        try {
+          const bid = await Bid.create({
+            cardId,
+            email,
+            amount,
+          });
+
+          res.send(bid);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/", async (req, res, next) => {
+  try {
+    const cards = await Card.findAll({
+      include: [Bid],
+      order: [["updatedAt", "DESC"]],
+    });
+
+    res.send({ cards: cards });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/:cardId", async (req, res, next) => {
+  const id = parseInt(req.params.cardId);
+  try {
+    const cardDetail = await Card.findByPk(id, {
+      include: [Bid],
+      order: [["updatedAt", "DESC"]],
+    });
+
+    if (!cardDetail) {
+      res.status(404).send("Not Found!");
+    } else {
+      res.send({ cardDetail });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/", async (req, res, next) => {
+  const { cardId } = req.body;
+  try {
+    const cardById = await Card.findByPk(cardId, {
+      include: [Bid],
+      order: [["updatedAt", "DESC"]],
+    });
+    const cardHearts = cardById.hearts;
+
+    if (!cardId) {
+      res.status(400).send("Incomplete query!");
+    } else {
+      try {
+        if (!cardById) {
+          res.status(404).send("Table Not Found!");
+        } else {
+          const update = await cardById.update({
+            hearts: cardHearts + 1,
+          });
+          res.send(update);
+        }
+      } catch (e) {
+        next(e);
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+module.exports = router;
