@@ -127,6 +127,7 @@ router.post("/bid", authMiddleware, async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
+    console.log("fetchcards worked #################");
     const cards = await Card.findAll({
       include: [Bid],
       order: [["updatedAt", "DESC"]],

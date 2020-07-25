@@ -17,11 +17,11 @@ const bodyParserMiddleWare = express.json();
 app.use(bodyParserMiddleWare);
 app.use(corsMiddleWare());
 
-if (process.env.DELAY) {
-  app.use((req, res, next) => {
-    setTimeout(() => next(), parseInt(process.env.DELAY));
-  });
-}
+// if (process.env.DELAY) {
+//   app.use((req, res, next) => {
+//     setTimeout(() => next(), parseInt(process.env.DELAY));
+//   });
+// }
 
 app.use("/", authRouter);
 app.use("/cards", cardRouter);
