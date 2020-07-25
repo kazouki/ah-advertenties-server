@@ -7,16 +7,47 @@ const authMiddleware = require("../auth/middleware");
 const router = new Router();
 
 router.post("/", authMiddleware, async (req, res, next) => {
-  const { title, imageUrl, minimumBid, userId } = req.body;
-  if (!title || !imageUrl || !minimumBid || !userId) {
+  const {
+    aangeboden,
+    gevraagd,
+    title,
+    description,
+    name,
+    telephone,
+    email,
+    date,
+    userId,
+    imageUrl,
+    minimumBid,
+  } = req.body;
+  if (
+    !aangeboden ||
+    !gevraagd ||
+    !title ||
+    !description ||
+    !name ||
+    !telephone ||
+    !email ||
+    !date ||
+    !userId ||
+    !imageUrl ||
+    !minimumBid
+  ) {
     res.status(400).send("Bad Request!");
   } else {
     try {
       const newCard = await Card.create({
+        aangeboden,
+        gevraagd,
         title,
+        description,
+        name,
+        telephone,
+        email,
+        date,
+        userId,
         imageUrl,
         minimumBid,
-        userId,
         hearts: 0,
       });
       res.send(newCard);

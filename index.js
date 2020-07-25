@@ -7,6 +7,7 @@ const { PORT } = require("./config/constants");
 
 const authRouter = require("./routers/auth");
 const cardRouter = require("./routers/card");
+const messageRouter = require("./routers/message");
 
 const app = express();
 
@@ -24,6 +25,7 @@ if (process.env.DELAY) {
 
 app.use("/", authRouter);
 app.use("/cards", cardRouter);
+app.use("/messages", messageRouter);
 
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
