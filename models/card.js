@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       date: DataTypes.STRING,
       userId: { type: DataTypes.INTEGER, allowNull: false },
+      imageUrl: DataTypes.STRING,
+      minimumBid: DataTypes.INTEGER,
+      hearts: DataTypes.INTEGER,
+      columnIndex: DataTypes.INTEGER,
     },
     {
       sequelize,

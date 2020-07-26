@@ -12,14 +12,14 @@ module.exports = {
     await queryInterface.addColumn(
       "cards",
       "minimumBid",
-      { type: Sequelize.INTEGER },
+      { type: Sequelize.INTEGER, defaultValue: 0 },
       {}
     );
 
     await queryInterface.addColumn(
       "cards",
       "hearts",
-      { type: Sequelize.INTEGER },
+      { type: Sequelize.INTEGER, defaultValue: 0 },
       {}
     );
   },

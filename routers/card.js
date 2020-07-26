@@ -19,19 +19,22 @@ router.post("/", authMiddleware, async (req, res, next) => {
     userId,
     imageUrl,
     minimumBid,
+    columnIndex,
   } = req.body;
   if (
-    !aangeboden ||
-    !gevraagd ||
-    !title ||
-    !description ||
-    !name ||
-    !telephone ||
-    !email ||
-    !date ||
-    !userId ||
-    !imageUrl ||
-    !minimumBid
+    // !aangeboden ||
+    // !gevraagd ||
+    // !title ||
+    // !description ||
+    // !name ||
+    // !telephone ||
+    // !email ||
+    // !date ||
+    // !userId ||
+    // !imageUrl ||
+    // !minimumBid ||
+    // !columnIndex
+    true === false
   ) {
     res.status(400).send("Bad Request!");
   } else {
@@ -54,6 +57,59 @@ router.post("/", authMiddleware, async (req, res, next) => {
     } catch (error) {
       next(error);
     }
+  }
+});
+
+router.delete("/:cardId", async (req, res, next) => {
+  try {
+    const cardId = parseInt(req.params.cardId);
+    const toDelete = await Card.findByPk(cardId);
+    if (!toDelete) {
+      res.status(404).send("Card not found");
+    } else {
+      const deleted = await toDelete.destroy();
+      res.json(deleted);
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.put("/", async (req, res, next) => {
+  console.log("cardProps (req.body) in put ################### ", req.body);
+  const {
+    aangeboden,
+    columnIndex,
+    date,
+    description,
+    email,
+    gevraagd,
+    name,
+    telephone,
+    title,
+    cardId,
+  } = req.body;
+  try {
+    // const cardId = parseInt(req.params.listId);
+    const toUpdate = await Card.findByPk(cardId);
+    if (!toUpdate) {
+      res.status(404).send("Card not found");
+    } else {
+      const updated = await toUpdate.update({
+        aangeboden,
+        columnIndex,
+        date,
+        description,
+        email,
+        gevraagd,
+        name,
+        telephone,
+        title,
+      });
+      res.json(updated);
+    }
+  } catch (e) {
+    next(e);
   }
 });
 
@@ -133,7 +189,7 @@ router.get("/", async (req, res, next) => {
       order: [["updatedAt", "DESC"]],
     });
 
-    res.send({ cards: cards });
+    res.send({ cards });
   } catch (error) {
     next(error);
   }
