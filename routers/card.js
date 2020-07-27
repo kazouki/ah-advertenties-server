@@ -23,7 +23,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
   }
 });
 
-router.delete("/", authMiddleware, async (req, res, next) => {
+router.delete("/", async (req, res, next) => {
   try {
     const cardId = req.body.cardId;
     const toDelete = await Card.findByPk(cardId);
@@ -76,6 +76,23 @@ router.put("/", authMiddleware, async (req, res, next) => {
     }
   } catch (e) {
     next(e);
+  }
+});
+
+router.post("/usercards", async (req, res, next) => {
+  const { userId } = req.body;
+  console.log("#########   id in get /usercards ::::::  ", userId);
+  console.log("#########   req.body in get /usercards ::::::  ", req.body);
+  try {
+    const cards = await Card.findAll({
+      where: {
+        userId: userId,
+      },
+      order: [["createdAt", "DESC"]],
+    });
+    res.send(cards);
+  } catch (error) {
+    next(error);
   }
 });
 

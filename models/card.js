@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       imageUrl: DataTypes.STRING,
       minimumBid: DataTypes.INTEGER,
       hearts: DataTypes.INTEGER,
-      columnIndex: DataTypes.INTEGER,
+      columnIndex: { type: DataTypes.INTEGER, defaultValue: 1 },
     },
     {
       sequelize,
