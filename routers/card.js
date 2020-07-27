@@ -7,51 +7,13 @@ const authMiddleware = require("../auth/middleware");
 const router = new Router();
 
 router.post("/", authMiddleware, async (req, res, next) => {
-  const {
-    aangeboden,
-    gevraagd,
-    title,
-    description,
-    name,
-    telephone,
-    email,
-    date,
-    userId,
-    imageUrl,
-    minimumBid,
-    columnIndex,
-  } = req.body;
-  if (
-    // !aangeboden ||
-    // !gevraagd ||
-    // !title ||
-    // !description ||
-    // !name ||
-    // !telephone ||
-    // !email ||
-    // !date ||
-    // !userId ||
-    // !imageUrl ||
-    // !minimumBid ||
-    // !columnIndex
-    true === false
-  ) {
+  const { userId } = req.body;
+  if (true === false) {
     res.status(400).send("Bad Request!");
   } else {
     try {
       const newCard = await Card.create({
-        aangeboden,
-        gevraagd,
-        title,
-        description,
-        name,
-        telephone,
-        email,
-        date,
         userId,
-        imageUrl,
-        minimumBid,
-        hearts: 0,
       });
       res.send(newCard);
     } catch (error) {
@@ -60,9 +22,9 @@ router.post("/", authMiddleware, async (req, res, next) => {
   }
 });
 
-router.delete("/:cardId", async (req, res, next) => {
+router.delete("/", authMiddleware, async (req, res, next) => {
   try {
-    const cardId = parseInt(req.params.cardId);
+    const cardId = req.body.cardId;
     const toDelete = await Card.findByPk(cardId);
     if (!toDelete) {
       res.status(404).send("Card not found");
@@ -75,36 +37,39 @@ router.delete("/:cardId", async (req, res, next) => {
   }
 });
 
-router.put("/", async (req, res, next) => {
-  console.log("cardProps (req.body) in put ################### ", req.body);
+router.put("/", authMiddleware, async (req, res, next) => {
   const {
     aangeboden,
-    columnIndex,
-    date,
-    description,
-    email,
     gevraagd,
+    title,
+    description,
     name,
     telephone,
-    title,
+    email,
+    date,
+    userId,
     cardId,
+    columnIndex,
   } = req.body;
   try {
-    // const cardId = parseInt(req.params.listId);
     const toUpdate = await Card.findByPk(cardId);
     if (!toUpdate) {
       res.status(404).send("Card not found");
     } else {
       const updated = await toUpdate.update({
-        aangeboden,
-        columnIndex,
-        date,
-        description,
-        email,
-        gevraagd,
-        name,
-        telephone,
-        title,
+        aangeboden: aangeboden,
+        gevraagd: gevraagd,
+        title: title,
+        description: description,
+        name: name,
+        telephone: telephone,
+        email: email,
+        date: date,
+        userId: userId,
+        imageUrl: " ",
+        minimumBid: 0,
+        hearts: 0,
+        columnIndex: columnIndex,
       });
       res.json(updated);
     }
@@ -183,7 +148,6 @@ router.post("/bid", authMiddleware, async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    console.log("fetchcards worked #################");
     const cards = await Card.findAll({
       include: [Bid],
       order: [["updatedAt", "DESC"]],
