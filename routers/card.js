@@ -7,13 +7,14 @@ const authMiddleware = require("../auth/middleware");
 const router = new Router();
 
 router.post("/", authMiddleware, async (req, res, next) => {
-  const { userId } = req.body;
+  const { userId, columnIndex } = req.body;
   if (true === false) {
     res.status(400).send("Bad Request!");
   } else {
     try {
       const newCard = await Card.create({
         userId,
+        columnIndex,
       });
       res.send(newCard);
     } catch (error) {

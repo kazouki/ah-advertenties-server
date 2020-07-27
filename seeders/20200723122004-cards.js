@@ -8,7 +8,7 @@ module.exports = {
         {
           aangeboden: false,
           gevraagd: true,
-          title: "kapper gezocht",
+          title: "card 1 / columnIndex 1 userId 2",
           description:
             "ben jij een buurt kapper en heb je tijd om haar te knippen? bel me dan graag!",
           name: "rita",
@@ -26,7 +26,7 @@ module.exports = {
         {
           aangeboden: true,
           gevraagd: false,
-          title: "Ouwe fiets te koop",
+          title: "card 2 / columnIndex 2 / userId 1",
           description:
             "hoi ik heb een oude fiets te koop, beetje olie ertussen en gaan! prijs - 20 eu",
           name: "henk",
@@ -44,7 +44,7 @@ module.exports = {
         {
           aangeboden: true,
           gevraagd: true,
-          title: "zolder spullen te koop en gezocht!",
+          title: "card 3 / columnIndex 3 / userId 3",
           description:
             "ik heb allerlei oude zolder spullen te koop, kom kijken! ik ben ook benieuwd wat u te koop heeft",
           name: "sjon",
@@ -62,7 +62,7 @@ module.exports = {
         {
           aangeboden: true,
           gevraagd: true,
-          title: "oude tv kom maar ophalen",
+          title: "card 4 / columnIndex 3 / userId 4",
           description: "tv uit de jaren tachtig, te groot past niet in mn huis",
           name: "gerard",
           telephone: "012345690",

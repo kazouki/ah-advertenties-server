@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.addColumn(
       "cards",
       "columnIndex",
-      { type: Sequelize.INTEGER, defaultValue: 0 },
+      { type: Sequelize.INTEGER, defaultValue: 1 },
       {}
     );
   },
