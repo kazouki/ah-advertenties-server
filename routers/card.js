@@ -6,15 +6,17 @@ const authMiddleware = require("../auth/middleware");
 
 const router = new Router();
 
-router.post("/", authMiddleware, async (req, res, next) => {
-  const { userId, columnIndex } = req.body;
-  if (true === false) {
-    res.status(400).send("Bad Request!");
+router.post("/", async (req, res, next) => {
+  const { userId, columnIndex, cardProps } = req.body;
+  console.log("cardProps  in POST /   ############", cardProps);
+  if (!userId || !columnIndex || !cardProps) {
+    res.status(400).send("Bad Request");
   } else {
     try {
       const newCard = await Card.create({
         userId,
         columnIndex,
+        ...cardProps,
       });
       res.send(newCard);
     } catch (error) {
@@ -23,7 +25,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
   }
 });
 
-router.delete("/", async (req, res, next) => {
+router.delete("/", authMiddleware, async (req, res, next) => {
   try {
     const cardId = req.body.cardId;
     const toDelete = await Card.findByPk(cardId);
@@ -31,6 +33,20 @@ router.delete("/", async (req, res, next) => {
       res.status(404).send("Card not found");
     } else {
       const deleted = await toDelete.destroy();
+      res.json(deleted);
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.delete("/all", async (req, res, next) => {
+  try {
+    const toDelete = await Card.findAll();
+    if (!toDelete) {
+      res.status(404).send("Cards not found");
+    } else {
+      const deleted = toDelete.forEach(async (card) => await card.destroy());
       res.json(deleted);
     }
   } catch (e) {
@@ -81,8 +97,6 @@ router.put("/", authMiddleware, async (req, res, next) => {
 
 router.post("/usercards", async (req, res, next) => {
   const { userId } = req.body;
-  console.log("#########   id in get /usercards ::::::  ", userId);
-  console.log("#########   req.body in get /usercards ::::::  ", req.body);
   try {
     const cards = await Card.findAll({
       where: {
