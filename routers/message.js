@@ -2,6 +2,7 @@ const { Router } = require("express");
 // const Card = require("../models").card;
 // const Bid = require("../models").bid;
 const Message = require("../models").message;
+const { Op } = require("sequelize");
 
 const authMiddleware = require("../auth/middleware");
 
@@ -27,20 +28,40 @@ router.post("/", async (req, res, next) => {
 });
 
 router.post("/all", async (req, res, next) => {
+  const cardOwnerId = parseInt(req.body.cardOwnerId);
+  const { userId } = req.body;
+  console.log("#########");
+  console.log("query in message/all #########", req.body);
+  console.log("#########");
+  if (!cardOwnerId || !userId) {
+    next.send("Incomplete request");
+  }
   try {
-    const cardOwnerId = parseInt(req.body.cardOwnerId);
-    const { userId } = req.body;
-    const query = await Message.findAll({
+    const messages = await Message.findAll({
       where: {
-        fromUserId: userId,
-        toUserId: cardOwnerId,
+        [Op.or]: [
+          { fromUserId: userId, toUserId: cardOwnerId },
+          { fromUserId: cardOwnerId, toUserId: userId },
+        ],
       },
+
       order: [["createdAt", "DESC"]],
     });
-    res.send(query);
+    console.log("#########");
+    console.log("messages in message/all #############", messages);
+    console.log("#########");
+    res.send(messages);
   } catch (e) {
     next(e);
   }
 });
 
 module.exports = router;
+
+// [
+//   {
+//     fromUserId: userId,
+//     toUserId: cardOwnerId,
+//   },
+// ]
+// ,

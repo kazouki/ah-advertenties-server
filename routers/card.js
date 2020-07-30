@@ -14,9 +14,9 @@ router.post("/", async (req, res, next) => {
   } else {
     try {
       const newCard = await Card.create({
+        ...cardProps,
         userId,
         columnIndex,
-        ...cardProps,
       });
       res.send(newCard);
     } catch (error) {
