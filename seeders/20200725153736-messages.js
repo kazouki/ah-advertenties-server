@@ -6,16 +6,18 @@ module.exports = {
       "messages",
       [
         {
-          fromUserId: 1,
+          userId: 1,
           toUserId: 2,
           text: "hallo is de fiets te koop?",
+          isRead: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          fromUserId: 2,
+          userId: 2,
           toUserId: 1,
           text: "jahoor kom maar ophalen",
+          isRead: false,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

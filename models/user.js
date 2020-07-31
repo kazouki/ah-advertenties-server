@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       user.hasMany(models.card);
       user.hasMany(models.favorite);
+      user.hasMany(models.message);
     }
   }
   user.init(

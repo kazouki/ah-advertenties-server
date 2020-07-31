@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      fromUserId: {
+      userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
@@ -20,6 +20,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      isRead: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

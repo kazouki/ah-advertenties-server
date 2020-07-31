@@ -9,13 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      message.belongsTo(models.user);
     }
   }
   message.init(
     {
-      fromUserId: DataTypes.INTEGER,
+      userId: DataTypes.INTEGER,
       toUserId: DataTypes.INTEGER,
       text: DataTypes.STRING,
+      isRead: { type: DataTypes.BOOLEAN, defaultValue: false },
     },
     {
       sequelize,
