@@ -8,7 +8,6 @@ const router = new Router();
 
 router.post("/", async (req, res, next) => {
   const { userId, columnIndex, cardProps } = req.body;
-  console.log("cardProps  in POST /   ############", cardProps);
   if (!userId || !columnIndex || !cardProps) {
     res.status(400).send("Bad Request");
   } else {

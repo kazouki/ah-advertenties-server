@@ -8,6 +8,7 @@ const { PORT } = require("./config/constants");
 const authRouter = require("./routers/auth");
 const cardRouter = require("./routers/card");
 const messageRouter = require("./routers/message");
+const favoritesRouter = require("./routers/favorite");
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(corsMiddleWare());
 app.use("/", authRouter);
 app.use("/cards", cardRouter);
 app.use("/messages", messageRouter);
+app.use("/favorites", favoritesRouter);
 
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
