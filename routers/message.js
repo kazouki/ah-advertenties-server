@@ -3,6 +3,7 @@ const { Router } = require("express");
 // const Bid = require("../models").bid;
 const Message = require("../models").message;
 const User = require("../models").user;
+const Card = require("../models").card;
 const { Op } = require("sequelize");
 
 const authMiddleware = require("../auth/middleware");
@@ -45,6 +46,9 @@ router.post("/conversation", async (req, res, next) => {
 
       order: [["createdAt", "DESC"]],
     });
+    console.log("########");
+    console.log("messages   in /conversation", messages);
+    console.log("########");
     res.send(messages);
   } catch (e) {
     next(e);
@@ -88,6 +92,31 @@ router.post("/inbox", async (req, res, next) => {
     res.send(messages);
   } catch (e) {
     next(e);
+  }
+});
+
+router.post("/remoteusername", async (req, res, next) => {
+  const { cardOwnerId } = req.body;
+  if (!cardOwnerId) {
+    res.send("Incomplete request");
+  }
+  try {
+    const user = await User.findByPk(cardOwnerId);
+    res.send(user.name);
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.delete("/", async (req, res, next) => {
+  try {
+    const toDelete = await Message.findAll();
+    const deleted = await toDelete.forEach(
+      async (message) => await message.destroy()
+    );
+    res.send(deleted);
+  } catch (error) {
+    next(error);
   }
 });
 
