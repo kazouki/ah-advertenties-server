@@ -7,6 +7,7 @@ const Card = require("../models").card;
 const { Op } = require("sequelize");
 
 const authMiddleware = require("../auth/middleware");
+const message = require("../models/message");
 
 const router = new Router();
 
@@ -83,13 +84,33 @@ router.post("/inbox", async (req, res, next) => {
   }
   try {
     const messages = await Message.findAll({
-      where: { toUserId: userId },
+      // where: { toUserId: userId },
+      where: {
+        [Op.or]: [{ userId }, { toUserId: userId }],
+      },
 
       include: [User],
 
       order: [["createdAt", "DESC"]],
     });
-    res.send(messages);
+    console.log("########################");
+    console.log("inbox messages ", messages);
+    console.log("########################");
+    const users = await User.findAll();
+
+    const newMessages = messages.map((message) => {
+      return {
+        ...message.dataValues,
+        recipient: users.find((user) => {
+          return user.dataValues.id === message.dataValues.toUserId;
+        }),
+      };
+    });
+    console.log("########################");
+    console.log("inbox newMessages ", newMessages);
+    console.log("########################");
+
+    res.send(newMessages);
   } catch (e) {
     next(e);
   }
@@ -101,8 +122,9 @@ router.post("/remoteusername", async (req, res, next) => {
     res.send("Incomplete request");
   }
   try {
-    const user = await User.findByPk(cardOwnerId);
-    res.send(user.name);
+    const card = await Card.findByPk(cardOwnerId, { include: [User] });
+
+    res.send({ name: card.user.name, id: card.user.id });
   } catch (e) {
     next(e);
   }
