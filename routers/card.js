@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const Card = require("../models").card;
 const Bid = require("../models").bid;
+const User = require("../models").user;
 
 const authMiddleware = require("../auth/middleware");
 
@@ -211,7 +212,8 @@ router.get("/:cardId", async (req, res, next) => {
   const id = parseInt(req.params.cardId);
   try {
     const cardDetail = await Card.findByPk(id, {
-      include: [Bid],
+      // include: [Bid],
+      include: [{ model: Bid }, { model: User }],
       order: [["updatedAt", "DESC"]],
     });
 

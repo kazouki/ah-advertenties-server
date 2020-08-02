@@ -29,6 +29,8 @@ router.post("/", async (req, res, next) => {
 });
 
 router.post("/conversation", async (req, res, next) => {
+  console.log("###########");
+  console.log("req.body  in /converstaion ", req.body);
   const remoteUserId = parseInt(req.body.remoteUserId);
   const { userId } = req.body;
   if (!remoteUserId || !userId) {
@@ -81,13 +83,18 @@ router.post("/inbox", async (req, res, next) => {
 });
 
 router.post("/remoteusername", async (req, res, next) => {
-  const { cardOwnerId } = req.body;
-  if (!cardOwnerId) {
+  const { cardId } = req.body;
+  if (!cardId) {
     res.send("Incomplete request");
   }
   try {
-    const card = await Card.findByPk(cardOwnerId, { include: [User] });
-
+    const card = await Card.findByPk(parseInt(cardId), {
+      include: [User],
+    });
+    if (!card.user) {
+      res.status(404);
+    }
+    console.log("card   in  /remoteusername", card);
     res.send({ name: card.user.name, id: card.user.id });
   } catch (e) {
     next(e);
