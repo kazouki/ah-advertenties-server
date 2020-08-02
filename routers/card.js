@@ -94,6 +94,23 @@ router.put("/", authMiddleware, async (req, res, next) => {
   }
 });
 
+router.put("/index", authMiddleware, async (req, res, next) => {
+  const { cardId, columnIndex } = req.body;
+  try {
+    const toUpdate = await Card.findByPk(cardId);
+    if (!toUpdate) {
+      res.status(404).send("Card not found");
+    } else {
+      const updated = await toUpdate.update({
+        columnIndex,
+      });
+      res.json(updated);
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.post("/usercards", async (req, res, next) => {
   const { userId } = req.body;
   try {

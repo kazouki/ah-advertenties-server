@@ -1,13 +1,11 @@
 const { Router } = require("express");
-// const Card = require("../models").card;
-// const Bid = require("../models").bid;
 const Message = require("../models").message;
 const User = require("../models").user;
 const Card = require("../models").card;
 const { Op } = require("sequelize");
 
 const authMiddleware = require("../auth/middleware");
-const message = require("../models/message");
+const user = require("../models/user");
 
 const router = new Router();
 
@@ -47,30 +45,7 @@ router.post("/conversation", async (req, res, next) => {
 
       order: [["createdAt", "DESC"]],
     });
-    console.log("########");
-    console.log("messages   in /conversation", messages);
-    console.log("########");
-    res.send(messages);
-  } catch (e) {
-    next(e);
-  }
-});
 
-// TODO adjust router to collect correct messages
-router.post("/all", async (req, res, next) => {
-  const { userId } = req.body;
-  if (!userId) {
-    res.send("Incomplete request");
-  }
-  try {
-    const messages = await Message.findAll({
-      where: {
-        [Op.or]: [{ userId }, { toUserId: userId }],
-      },
-      include: [Bid],
-
-      order: [["createdAt", "DESC"]],
-    });
     res.send(messages);
   } catch (e) {
     next(e);
@@ -84,20 +59,13 @@ router.post("/inbox", async (req, res, next) => {
   }
   try {
     const messages = await Message.findAll({
-      // where: { toUserId: userId },
       where: {
         [Op.or]: [{ userId }, { toUserId: userId }],
       },
-
       include: [User],
-
       order: [["createdAt", "DESC"]],
     });
-    console.log("########################");
-    console.log("inbox messages ", messages);
-    console.log("########################");
     const users = await User.findAll();
-
     const newMessages = messages.map((message) => {
       return {
         ...message.dataValues,
@@ -106,10 +74,6 @@ router.post("/inbox", async (req, res, next) => {
         }),
       };
     });
-    console.log("########################");
-    console.log("inbox newMessages ", newMessages);
-    console.log("########################");
-
     res.send(newMessages);
   } catch (e) {
     next(e);
@@ -142,12 +106,71 @@ router.delete("/", async (req, res, next) => {
   }
 });
 
-module.exports = router;
+router.put("/isread", async (req, res, next) => {
+  try {
+    const toUpdate = await Message.findByPk(parseInt(req.body.id));
+    if (!toUpdate) {
+      res.status(404).send("Message not found");
+    } else {
+      const updated = await toUpdate.update(req.body);
 
-// [
-//   {
-//     fromUserId: userId,
-//     toUserId: cardOwnerId,
-//   },
-// ]
-// ,
+      if (updated) {
+        try {
+          const allUserMessages = await Message.findAll({
+            where: {
+              toUserId: req.body.activeUser,
+            },
+          });
+
+          const unreadMessages = allUserMessages
+            .filter((message) => message.dataValues.isRead === false)
+            .map((mess) => {
+              return { a: req.body.activeUser, b: mess.dataValues.userId };
+            });
+
+          const unique = Array.from(
+            new Set(unreadMessages.map((m) => m.b))
+          ).map((a) => {
+            return unreadMessages.find((obj) => obj.b === a);
+          });
+
+          res.json({ unreadMessages: unique.length });
+        } catch (e) {
+          console.log(e);
+        }
+      } else res.json(updated);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/allunread", async (req, res, next) => {
+  const { userId } = req.body;
+  if (!userId) {
+    res.send("Incomplete request");
+  }
+  try {
+    const allUserMessages = await Message.findAll({
+      where: {
+        toUserId: userId,
+      },
+    });
+    const unreadMessages = allUserMessages
+      .filter((message) => message.dataValues.isRead === false)
+      .map((mess) => {
+        return { a: userId, b: mess.dataValues.userId };
+      });
+
+    const unique = Array.from(new Set(unreadMessages.map((m) => m.b))).map(
+      (a) => {
+        return unreadMessages.find((obj) => obj.b === a);
+      }
+    );
+    res.json({ unreadMessages: unique.length });
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+module.exports = router;
