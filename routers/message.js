@@ -90,7 +90,6 @@ router.post("/remoteusername", async (req, res, next) => {
     if (!card.user) {
       res.status(404);
     }
-    console.log("card   in  /remoteusername", card);
     res.send({ name: card.user.name, id: card.user.id });
   } catch (e) {
     next(e);
