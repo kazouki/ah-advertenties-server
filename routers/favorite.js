@@ -6,7 +6,7 @@ const authMiddleware = require("../auth/middleware");
 
 const router = new Router();
 
-router.post("/", async (req, res, next) => {
+router.post("/", authMiddleware, async (req, res, next) => {
   const { userId, cardId } = req.body;
   if (!userId || !cardId) {
     res.status(400).send("Bad Request");
@@ -51,7 +51,7 @@ router.delete("/all", async (req, res, next) => {
   }
 });
 
-router.delete("/", async (req, res, next) => {
+router.delete("/", authMiddleware, async (req, res, next) => {
   const { cardId, userId } = req.body;
   try {
     const toDelete = await Favorite.findAll({

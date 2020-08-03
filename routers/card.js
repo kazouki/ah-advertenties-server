@@ -8,7 +8,7 @@ const authMiddleware = require("../auth/middleware");
 
 const router = new Router();
 
-router.post("/", async (req, res, next) => {
+router.post("/", authMiddleware, async (req, res, next) => {
   const { userId, columnIndex, cardProps } = req.body;
   if (!userId || !columnIndex || !cardProps) {
     res.status(400).send("Bad Request");
@@ -57,7 +57,7 @@ router.delete("/", authMiddleware, async (req, res, next) => {
   return null;
 });
 
-router.delete("/all", async (req, res, next) => {
+router.delete("/all", authMiddleware, async (req, res, next) => {
   try {
     const toDelete = await Card.findAll();
     if (!toDelete) {
@@ -162,7 +162,6 @@ router.post("/userfavorites", async (req, res, next) => {
       res.status(404);
     } else {
       const favCards = favorites.map((fav) => fav.card.dataValues);
-      console.log("favCards  ##############", favCards);
       res.json(favCards);
     }
   } catch (error) {
@@ -259,7 +258,6 @@ router.get("/:cardId", async (req, res, next) => {
   const id = parseInt(req.params.cardId);
   try {
     const cardDetail = await Card.findByPk(id, {
-      // include: [Bid],
       include: [{ model: Bid }, { model: User }],
       order: [["updatedAt", "DESC"]],
     });
@@ -271,37 +269,6 @@ router.get("/:cardId", async (req, res, next) => {
     }
   } catch (error) {
     next(error);
-  }
-  return null;
-});
-
-router.patch("/", async (req, res, next) => {
-  const { cardId } = req.body;
-  try {
-    const cardById = await Card.findByPk(cardId, {
-      include: [Bid],
-      order: [["updatedAt", "DESC"]],
-    });
-    const cardHearts = cardById.hearts;
-
-    if (!cardId) {
-      res.status(400).send("Incomplete query!");
-    } else {
-      try {
-        if (!cardById) {
-          res.status(404).send("Table Not Found!");
-        } else {
-          const update = await cardById.update({
-            hearts: cardHearts + 1,
-          });
-          res.send(update);
-        }
-      } catch (e) {
-        next(e);
-      }
-    }
-  } catch (e) {
-    console.log(e);
   }
   return null;
 });

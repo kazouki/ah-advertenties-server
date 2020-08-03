@@ -9,8 +9,7 @@ const user = require("../models/user");
 
 const router = new Router();
 
-router.post("/", async (req, res, next) => {
-  console.log("postmessages query req.body  :: ", req.body);
+router.post("/", authMiddleware, async (req, res, next) => {
   const { userId, toUserId, text } = req.body;
   if (!userId || !toUserId || !text) {
     res.status(400).send("Bad Request");
@@ -28,9 +27,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.post("/conversation", async (req, res, next) => {
-  console.log("###########");
-  console.log("req.body  in /converstaion ", req.body);
+router.post("/conversation", authMiddleware, async (req, res, next) => {
   const remoteUserId = parseInt(req.body.remoteUserId);
   const { userId } = req.body;
   if (!remoteUserId || !userId) {
@@ -47,14 +44,13 @@ router.post("/conversation", async (req, res, next) => {
 
       order: [["createdAt", "DESC"]],
     });
-
     res.send(messages);
   } catch (e) {
     next(e);
   }
 });
 
-router.post("/inbox", async (req, res, next) => {
+router.post("/inbox", authMiddleware, async (req, res, next) => {
   const { userId } = req.body;
   if (!userId) {
     res.send("Incomplete request");
@@ -101,7 +97,7 @@ router.post("/remoteusername", async (req, res, next) => {
   }
 });
 
-router.delete("/", async (req, res, next) => {
+router.delete("/", authMiddleware, async (req, res, next) => {
   try {
     const toDelete = await Message.findAll();
     const deleted = await toDelete.forEach(
@@ -113,7 +109,7 @@ router.delete("/", async (req, res, next) => {
   }
 });
 
-router.put("/isread", async (req, res, next) => {
+router.put("/isread", authMiddleware, async (req, res, next) => {
   try {
     const toUpdate = await Message.findByPk(parseInt(req.body.id));
     if (!toUpdate) {
@@ -152,7 +148,7 @@ router.put("/isread", async (req, res, next) => {
   }
 });
 
-router.post("/allunread", async (req, res, next) => {
+router.post("/allunread", authMiddleware, async (req, res, next) => {
   const { userId } = req.body;
   if (!userId) {
     res.send("Incomplete request");
