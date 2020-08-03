@@ -2,6 +2,7 @@ const { Router } = require("express");
 const Card = require("../models").card;
 const Bid = require("../models").bid;
 const User = require("../models").user;
+const Favorite = require("../models").favorite;
 
 const authMiddleware = require("../auth/middleware");
 
@@ -23,6 +24,7 @@ router.post("/", async (req, res, next) => {
       next(error);
     }
   }
+  return null;
 });
 
 router.delete("/", authMiddleware, async (req, res, next) => {
@@ -33,11 +35,26 @@ router.delete("/", authMiddleware, async (req, res, next) => {
       res.status(404).send("Card not found");
     } else {
       const deleted = await toDelete.destroy();
+      if (deleted)
+        try {
+          const favsToDelete = await Favorite.findAll({
+            where: {
+              cardId,
+            },
+          });
+          const deletedFavs = favsToDelete.forEach(
+            async (fav) => await fav.destroy()
+          );
+        } catch (e) {
+          console.log(e);
+        }
+
       res.json(deleted);
     }
   } catch (e) {
     next(e);
   }
+  return null;
 });
 
 router.delete("/all", async (req, res, next) => {
@@ -52,6 +69,7 @@ router.delete("/all", async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+  return null;
 });
 
 router.put("/", authMiddleware, async (req, res, next) => {
@@ -93,9 +111,10 @@ router.put("/", authMiddleware, async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+  return null;
 });
 
-router.put("/index", authMiddleware, async (req, res, next) => {
+router.put("/index", async (req, res, next) => {
   const { cardId, columnIndex } = req.body;
   try {
     const toUpdate = await Card.findByPk(cardId);
@@ -110,6 +129,7 @@ router.put("/index", authMiddleware, async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+  return null;
 });
 
 router.post("/usercards", async (req, res, next) => {
@@ -125,6 +145,30 @@ router.post("/usercards", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+  return null;
+});
+
+router.post("/userfavorites", async (req, res, next) => {
+  const { userId } = req.body;
+  try {
+    const favorites = await Favorite.findAll({
+      where: {
+        userId,
+      },
+      include: [Card],
+      order: [["createdAt", "DESC"]],
+    });
+    if (!favorites) {
+      res.status(404);
+    } else {
+      const favCards = favorites.map((fav) => fav.card.dataValues);
+      console.log("favCards  ##############", favCards);
+      res.json(favCards);
+    }
+  } catch (error) {
+    next(error);
+  }
+  return null;
 });
 
 router.get("/highestbid/:cardId", async (req, res, next) => {
@@ -146,6 +190,7 @@ router.get("/highestbid/:cardId", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+  return null;
 });
 
 router.post("/bid", authMiddleware, async (req, res, next) => {
@@ -193,6 +238,7 @@ router.post("/bid", authMiddleware, async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+  return null;
 });
 
 router.get("/", async (req, res, next) => {
@@ -206,6 +252,7 @@ router.get("/", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+  return null;
 });
 
 router.get("/:cardId", async (req, res, next) => {
@@ -225,6 +272,7 @@ router.get("/:cardId", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+  return null;
 });
 
 router.patch("/", async (req, res, next) => {
@@ -255,6 +303,7 @@ router.patch("/", async (req, res, next) => {
   } catch (e) {
     console.log(e);
   }
+  return null;
 });
 
 module.exports = router;

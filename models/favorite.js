@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       favorite.belongsTo(models.user);
+      favorite.belongsTo(models.card);
     }
   }
   favorite.init(
