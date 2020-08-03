@@ -10,27 +10,35 @@ module.exports = {
       },
       aangeboden: {
         type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
       gevraagd: {
         type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
       title: {
         type: Sequelize.STRING,
+        defaultValue: " ",
       },
       description: {
         type: Sequelize.STRING,
+        defaultValue: " ",
       },
       name: {
         type: Sequelize.STRING,
+        defaultValue: " ",
       },
       telephone: {
         type: Sequelize.STRING,
+        defaultValue: " ",
       },
       email: {
         type: Sequelize.STRING,
+        defaultValue: " ",
       },
       date: {
         type: Sequelize.STRING,
+        defaultValue: " ",
       },
       createdAt: {
         allowNull: false,

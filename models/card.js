@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       card.belongsTo(models.user);
+      card.hasMany(models.favorite);
       card.hasMany(models.bid);
     }
   }
@@ -23,6 +24,10 @@ module.exports = (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       date: DataTypes.STRING,
       userId: { type: DataTypes.INTEGER, allowNull: false },
+      imageUrl: DataTypes.STRING,
+      minimumBid: DataTypes.INTEGER,
+      hearts: DataTypes.INTEGER,
+      columnIndex: { type: DataTypes.INTEGER, defaultValue: 1 },
     },
     {
       sequelize,
